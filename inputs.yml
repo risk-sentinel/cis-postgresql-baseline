@@ -1,0 +1,25 @@
+# Consumer inputs for cis-postgresql.
+#
+# Override values per-environment via:
+#   cinc-auditor exec profiles/cis-postgresql \
+#     --input-file profiles/cis-postgresql/inputs.yml
+# or individually via --input name=value
+#
+# See inspec.yml for the full input catalogue and README.md for the
+# Portability section.
+
+# ----- AWS partition -----
+aws_partition: aws
+
+# ----- PostgreSQL major version -----
+# Set to the major version of the target Aurora-PostgreSQL fleet. One
+# of: '14', '15', '16', '17', '18'. Update in lockstep with any
+# operational engine upgrade so the profile stays aligned.
+postgresql_version: '15'
+
+# ----- Cluster scope (optional) -----
+# Empty (commented out) = auto-discover all Aurora-PostgreSQL clusters
+# in the target account. Set explicitly to scope the scan to named
+# clusters.
+# postgresql_cluster_identifiers:
+#   - my-prod-aurora-postgres

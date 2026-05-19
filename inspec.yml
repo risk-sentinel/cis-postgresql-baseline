@@ -1,0 +1,352 @@
+name: cis-postgresql
+title: PostgreSQL CIS Baseline
+maintainer: Risk Sentinel
+copyright: Risk Sentinel
+copyright_email: support@risk-sentinel.org
+license: Apache-2.0
+summary: |
+  Validates PostgreSQL deployments against CIS PostgreSQL Benchmark
+  v1.0.0 (shared across major versions 14–18; v13 excluded — AWS-
+  deprecated as of 2026).
+
+  Engine-portable across three deployment shapes via the
+  `engine_deployment` input:
+  - `rds_instance` (default) — standalone Amazon RDS PostgreSQL.
+  - `aurora_cluster` — Amazon Aurora-PostgreSQL.
+  - `self_managed` — PostgreSQL on EC2 / on-prem / other.
+
+  Parameter-group inspection uses local resources
+  (`aws_db_parameter_group` for RDS instances,
+  `aws_rds_cluster_parameter_group` for Aurora clusters). Self-managed
+  deployments use SQL-level checks only — parameter-group controls
+  fall back to host-transport rationale rather than running.
+
+  A subset of controls (~25) require direct psql query access against
+  PostgreSQL system catalogs (pg_roles / pg_namespace / pg_settings /
+  pg_extension / information_schema). They auto-detect a configured
+  endpoint and fall back to N/A when no PostgreSQL deployment is in
+  scope; consumers can override scope via `excluded_engines` /
+  `forced_engines` inputs.
+
+  Per-control partition applicability is documented in
+  partition_applicability.yml and mirrored on each control via
+  `tag applicable_partitions:`. Per-control version applicability via
+  `tag postgresql_versions:`.
+version: 0.1.0
+inspec_version: '>= 5.0'
+
+inputs:
+  - name: aws_partition
+    type: string
+    value: aws
+    description: >-
+      AWS partition the scan is running against.
+      One of: aws (Commercial), aws-us-gov (GovCloud non-DoD).
+
+  - name: excluded_engines
+    type: array
+    value: []
+    description: >-
+      Optional deny-list of PostgreSQL engine scopes to skip. Currently
+      only `postgresql` is meaningful (single-engine profile). Setting
+      `excluded_engines: [postgresql]` forces every DB-connection
+      control to render as N/A (impact 0.0) — used when PostgreSQL is
+      provisioned in the target account but intentionally out-of-scope
+      for this audit. Takes precedence over both auto-detect and
+      `forced_engines`.
+
+  - name: forced_engines
+    type: array
+    value: []
+    description: >-
+      Optional force-include list. Empty (default) = auto-detect alone
+      governs scope. Setting `forced_engines: [postgresql]` forces the
+      DB-connection controls to evaluate even when no PostgreSQL
+      deployment is auto-detected — useful for in-progress stand-ups
+      where provisioning is in flight. `excluded_engines` still trumps
+      this input.
+
+  - name: postgresql_version
+    type: string
+    value: '15'
+    description: >-
+      Major PostgreSQL version of the target deployment. One of: '14',
+      '15', '16', '17', '18'. Profile's CIS-benchmark coverage is
+      shared across these majors; the version scopes which controls
+      run (most apply uniformly; 4.10 is v14+v18 only). Default '15'
+      is the most-deployed major; override to match the deployed
+      fleet.
+
+  - name: postgresql_cluster_identifiers
+    type: array
+    value: []
+    description: >-
+      Optional explicit list of Aurora-PostgreSQL cluster identifiers
+      to evaluate when `engine_deployment == 'aurora_cluster'`.
+      Empty (default) = auto-discover via aws_rds_clusters filtered
+      to engine == 'aurora-postgresql'. Non-empty = evaluate only the
+      listed clusters (defence-in-depth filter if the account hosts
+      multiple engines).
+
+  # ----- DB-connection inputs -----
+  # Read by the local `aws_rds_aurora_psql_query` resource (named for
+  # historical reasons — works against both standalone RDS instances
+  # and Aurora clusters via IAM-DB auth + sslmode=require). When no
+  # endpoint is configured the resource exposes a `connection_error`
+  # and dependent controls fall back to N/A via auto-detect; consumers
+  # can override scope via `excluded_engines` / `forced_engines`.
+
+  - name: aurora_cluster_endpoint
+    type: string
+    value: ''
+    description: >-
+      Deprecated alias of `postgresql_endpoint`. Honored for backward
+      compatibility; new deployments should use `postgresql_endpoint`.
+      CI surfaces this via the `AURORA_CLUSTER_ENDPOINT` secret in
+      validate.yml's exec step (kept named for the existing secret;
+      no functional change).
+
+  - name: aurora_database_name
+    type: string
+    value: postgres
+    description: >-
+      Deprecated alias of `postgresql_database_name`. Default
+      `postgres` matches the most common PostgreSQL initial database;
+      override only if the consumer runs CIS scans against a non-
+      default DB.
+
+  - name: aurora_scanner_dbuser
+    type: string
+    value: inspec_scanner
+    description: >-
+      Deprecated alias of `postgresql_scanner_dbuser`. Default
+      `inspec_scanner` matches the user provisioned by the consumer's IaC pipeline
+      PR #189. Override only if the consumer's infra uses a different
+      scanner-identity name.
+
+  - name: aurora_port
+    type: numeric
+    value: 5432
+    description: >-
+      Deprecated alias of `postgresql_port`. Default 5432.
+      Override only for non-standard deployments.
+
+  - name: engine_deployment
+    type: string
+    value: rds_instance
+    description: >-
+      PostgreSQL deployment shape for parameter-group lookups. One of:
+      - 'rds_instance' (default) — standalone Amazon RDS PostgreSQL.
+        Controls iterate `aws_rds_instances` and use `aws_db_parameter_group`
+        (instance-level `describe_db_parameters` API).
+      - 'aurora_cluster' — Amazon Aurora-PostgreSQL. Controls iterate
+        `aws_rds_clusters` and use `aws_rds_cluster_parameter_group`
+        (cluster-level `describe_db_cluster_parameters` API).
+      - 'self_managed' — PostgreSQL on EC2 / on-prem / other.
+        Parameter-group controls fall back to host-transport
+        rationale; SQL-level checks via psql still run when an
+        endpoint is configured.
+
+      All three shapes share the same parameter names and SQL-level
+      checks; only the parameter-group resource lookup differs. For
+      consumers running multiple deployment patterns in the same
+      account, run the profile once per `engine_deployment` value.
+
+  - name: postgresql_endpoint
+    type: string
+    value: ''
+    description: >-
+      Primary database connection endpoint used by §4 / §5 / §6 /
+      §8.3 DB-connection controls. Takes precedence over the
+      deprecated `aurora_cluster_endpoint` alias. Set to the RDS
+      instance endpoint (standalone), Aurora cluster reader endpoint,
+      or self-managed PostgreSQL host. Empty (default) falls back to
+      `aurora_cluster_endpoint`, then to auto-detect; when no endpoint
+      is reachable, dependent controls go N/A rather than failing.
+
+  - name: postgresql_database_name
+    type: string
+    value: ''
+    description: >-
+      Engine-agnostic alias for the target database name. Takes
+      precedence over `aurora_database_name`. Defaults to 'postgres'
+      via the library when both inputs are empty.
+
+  - name: postgresql_scanner_dbuser
+    type: string
+    value: ''
+    description: >-
+      Engine-agnostic alias for the IAM-DB-auth scanner user.
+      Takes precedence over `aurora_scanner_dbuser`. Defaults to
+      'inspec_scanner' via the library when both inputs are empty.
+
+  - name: postgresql_port
+    type: numeric
+    value: 0
+    description: >-
+      Engine-agnostic alias for the database port. Takes precedence
+      over `aurora_port` when non-zero. Defaults to 5432 via the
+      library when both inputs are zero.
+
+  - name: postgresql_instance_identifiers
+    type: array
+    value: []
+    description: >-
+      Optional allowlist of standalone RDS PostgreSQL instance
+      identifiers to evaluate (parallel to `postgresql_cluster_identifiers`
+      for Aurora). Empty (default) = all visible PostgreSQL instances
+      in scope. Only consulted when `engine_deployment == 'rds_instance'`.
+
+  - name: cis_4_4_inactive_role_allowlist
+    type: array
+    value: []
+    description: >-
+      List of PostgreSQL role names exempt from CIS 4.4's
+      "every login-enabled role must have rolvaliduntil set" check.
+      Merged with `postgresql_admin_role_allowlist` to produce the
+      effective exempt set. Use this input for service-account roles
+      that are legitimately long-lived for CIS 4.4 specifically (e.g.,
+      the application connection-pool user, a CI/CD scanner user) but
+      should still be subject to other role-based checks. For the
+      common "master user, exempt everywhere" case, use
+      `postgresql_admin_role_allowlist` instead.
+      Default [] = strict (every non-system login role must have a
+      VALID UNTIL clause).
+
+  - name: cis_4_10_password_role_allowlist
+    type: array
+    value: []
+    description: >-
+      List of PostgreSQL role names that legitimately authenticate via
+      a stored password rather than IAM-DB-auth (rds_iam membership).
+      Merged with `postgresql_admin_role_allowlist` to produce the
+      effective exempt set. Use this input for service-account roles
+      that the consumer has verified out-of-band use a stored-password
+      mechanism for CIS 4.10 specifically, but should still be subject
+      to other role-based checks. For the common "master user, exempt
+      everywhere" case, use `postgresql_admin_role_allowlist` instead.
+
+      CIS 4.10 under the IAM-DB-auth posture asserts that every
+      non-system login-capable role is an rds_iam member. The scanner
+      role cannot read pg_authid.rolpassword (password hashes are
+      off-limits per the #184 discussion), so the automated check is
+      a conservative under-approximation: a non-rds_iam login role
+      MIGHT have a valid stored password, but the scanner can't see it.
+
+      Default [] = strict IAM-DB-auth posture (every login role must
+      be rds_iam member).
+
+  - name: postgresql_admin_role_allowlist
+    type: array
+    value: []
+    description: >-
+      Roles that the consumer considers legitimately privileged and that
+      should be exempt from ALL role-based CIS checks (C-4.3 admin
+      privileges, C-4.4 VALID UNTIL inactivity, C-4.10 IAM-DB-auth
+      posture, C-5.5 per-account connection limit). Most commonly the
+      RDS master user, which by design has CREATEROLE / CREATEDB,
+      unlimited connections, no VALID UNTIL, and stored-password auth —
+      all legitimate for a master role but flagged by the per-control
+      defaults.
+
+      Each role-based control merges this list with its control-specific
+      `cis_<X.Y>_*_allowlist` before filtering offenders. Define your
+      master user(s) here once instead of repeating them across four
+      per-control inputs. Per-control allowlists remain available for
+      narrower exemptions (e.g., a service-account role exempt from
+      VALID UNTIL but still required to use IAM-DB-auth).
+
+      Default [] = no shared allowlist; per-control allowlists alone
+      determine exemptions.
+
+  - name: cis_4_3_admin_role_allowlist
+    type: array
+    value: []
+    description: >-
+      List of PostgreSQL role names exempt from CIS 4.3's "no non-system
+      role with elevated admin privileges (rolsuper / rolcreaterole /
+      rolcreatedb / rolreplication / rolbypassrls)" check. Merged with
+      `postgresql_admin_role_allowlist` to produce the effective exempt
+      set. Use this input for roles that are legitimately privileged
+      for CIS 4.3 specifically but should still be subject to other
+      role-based checks. For the common "master user, exempt everywhere"
+      case, use `postgresql_admin_role_allowlist` instead.
+
+  - name: cis_5_5_connection_limit_allowlist
+    type: array
+    value: []
+    description: >-
+      List of PostgreSQL role names exempt from CIS 5.5's "every
+      non-system role must have a finite per-account connection limit
+      (rolconnlimit > 0)" check. Merged with
+      `postgresql_admin_role_allowlist` to produce the effective exempt
+      set. Use this input for roles that are legitimately unlimited
+      for CIS 5.5 specifically but should still be subject to other
+      role-based checks. For the common "master user, exempt everywhere"
+      case, use `postgresql_admin_role_allowlist` instead.
+
+  - name: logging_strategy
+    type: string
+    value: custom
+    description: >-
+      How logging-related CIS controls are satisfied for this
+      consumer's compliance boundary. One of:
+
+      - 'aws_default' — AWS-managed / centralised / cross-account
+        logging is the satisfaction mechanism. Logging controls in
+        scope skip with an inheritance rationale citing the consumer's
+        documented logging-architecture attestation. Pair with
+        `logging_attestation_reference` to identify where that
+        architecture is documented.
+      - 'custom' — this account / workload operates its own logging
+        stack. Controls assert against `logging_requirements` (below).
+
+      Default 'custom' forces explicit declaration; flip to
+      'aws_default' with a populated `logging_attestation_reference`
+      when consolidated logging (e.g., a security-tooling account
+      consolidating CloudTrail, a centralised SIEM ingesting events,
+      or an Organizations-level audit trail) satisfies the boundary
+      requirement that this account's per-control checks would
+      otherwise assert per-account.
+
+  - name: logging_attestation_reference
+    type: string
+    value: ''
+    description: >-
+      Consulted only when `logging_strategy == 'aws_default'`. Free-
+      form reference to the consumer's documented logging-boundary
+      architecture (e.g., a doc path like
+      'security-architecture/logging-baseline.md §3', a URL, or a
+      ticket reference). Surfaces verbatim in the inheritance skip
+      message on every affected control so auditors can trace the
+      attestation back to the source.
+
+  - name: logging_requirements
+    type: hash
+    value: {}
+    description: >-
+      Consulted only when `logging_strategy == 'custom'`. Consumer-
+      specific logging requirements that controls assert against.
+      Recognised keys (extend per profile — see README "Logging
+      strategy" for the keys this profile reads):
+
+      - retention_days: numeric — minimum CloudWatch / S3-access-log
+        retention period.
+      - log_group_arn_prefix: string — assert that log destinations
+        start with this prefix.
+      - required_metric_filters: array of CIS rule IDs (e.g., ["5.1",
+        "5.7", "5.16"]) — the consumer commits to operating these
+        filters in this account; rules not in the list skip with the
+        boundary-inheritance rationale.
+      - metric_filter_overrides: hash keyed by CIS rule ID — per-rule
+        structured assertions beyond presence (e.g., {"5.7":
+        {"threshold": 3}}).
+
+supports:
+  - platform: aws
+
+depends:
+  - name: inspec-aws
+    git: https://github.com/inspec/inspec-aws.git
+    branch: main
+    # TODO: pin to a tag after first green CI run.

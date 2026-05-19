@@ -1,0 +1,444 @@
+# Per-control partition applicability — auditor-facing flat table.
+# Values per partition: applicable | not_applicable | partial
+# `reason` is required when not_applicable or partial.
+# Keep this file in sync with `tag applicable_partitions:` on each control.
+#
+# CIS PostgreSQL against Aurora is partition-agnostic: same SDK surface,
+# same parameter-group concept, same engine behaviour. All controls are
+# applicable in both partitions; individual OS-layer controls are
+# Not-applicable-to-RDS/Aurora generally (not partition-specifically) —
+# that scope is captured in each control's describe body, not here.
+
+controls:
+  - id: 1.1
+    title: "Ensure packages are obtained from authorized repositories"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 1.2
+    title: "Install only required packages"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 1.3
+    title: "Ensure systemd Service Files Are Enabled"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 1.4
+    title: "Ensure Data Cluster Initialized Successfully"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 1.5
+    title: "Ensure the Latest Security Patches are Applied"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 1.6
+    title: "Verify That \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 1.7
+    title: "Verify That the \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.1
+    title: "Ensure the file permissions mask is correct"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.2
+    title: "Ensure extension directory has appropriate ownership and permissions"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.3
+    title: "Disable PostgreSQL Command History"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 2.4
+    title: "Ensure Passwords are Not Stored in the service file"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.2
+    title: "Ensure the log destinations are set correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.3
+    title: "Ensure the logging collector is enabled"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.4
+    title: "Ensure the log file destination directory is set correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.5
+    title: "Ensure the filename pattern for log files is set correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.6
+    title: "Ensure the log file permissions are set correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.7
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.8
+    title: "Ensure the maximum log file lifetime is set correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.9
+    title: "Ensure the maximum log file size is set correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.10
+    title: "Ensure the correct syslog facility is selected"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.11
+    title: "Ensure syslog messages are not suppressed"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.12
+    title: "Ensure syslog messages are not lost due to size"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.13
+    title: "Ensure the program name for PostgreSQL syslog messages is correct"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.14
+    title: "Ensure the correct messages are written to the server log"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.15
+    title: "Ensure the correct SQL statements generating errors are recorded"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.16
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.17
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.18
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.19
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.20
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.21
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.22
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.23
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.24
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.25
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.1.26
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 3.2
+    title: "Ensure the PostgreSQL Audit Extension (pgAudit) is enabled"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.1
+    title: "Ensure Interactive Login is Disabled"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.2
+    title: "Ensure sudo is configured correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.3
+    title: "Ensure excessive administrative privileges are revoked"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.4
+    title: "Lock Out Accounts if Not Currently in Use"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.5
+    title: "Ensure excessive function privileges are revoked"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.6
+    title: "Ensure excessive DML privileges are revoked"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.7
+    title: "Ensure Row Level Security (RLS) is configured correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.8
+    title: "Ensure the set_user extension is installed"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.9
+    title: "Make use of predefined roles"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 4.10
+    title: "Ensure all accounts that can log in have passwords"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.1
+    title: "Do Not Specify Passwords in the Command Line"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.2
+    title: "Ensure PostgreSQL is Bound to an IP Address"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.3
+    title: "Ensure login via \"local\" UNIX Domain Socket is configured correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.4
+    title: "Ensure login via \"host\" TCP/IP Socket is configured correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.5
+    title: "Ensure per-account connection limits are used"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 5.6
+    title: "Ensure Password Complexity is configured"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.1
+    title: "Understanding attack vectors and runtime parameters"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.2
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.3
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.4
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.5
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.6
+    title: "Ensure \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.7
+    title: "Ensure FIPS 140-2 OpenSSL Cryptography Is Used"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.8
+    title: "Ensure TLS is enabled and configured correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.9
+    title: "Ensure the TLSv1.0 and TLSv1.1 Protocols are Disabled"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.10
+    title: "Ensure Weak SSL/TLS Ciphers Are Disabled"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 6.11
+    title: "Ensure the pgcrypto extension is installed and configured correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 7.1
+    title: "Ensure a replication-only user is created and used for streaming replication"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 7.2
+    title: "Ensure logging of replication commands is configured"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 7.3
+    title: "Ensure base backups are configured and functional"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 7.4
+    title: "Ensure WAL archiving is configured and functional"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 7.5
+    title: "Ensure streaming replication parameters are configured correctly"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 8.1
+    title: "Ensure PostgreSQL subdirectory locations are outside the data cluster"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 8.2
+    title: "Ensure the backup and restore tool, \\"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
+  - id: 8.3
+    title: "Ensure miscellaneous configuration settings are correct"
+    aws: applicable
+    aws-us-gov: applicable
+    reason: ''
+
