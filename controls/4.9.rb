@@ -56,6 +56,7 @@ control 'C-4.9' do
   tag postgresql_versions:    ['14', '15', '16', '17', '18']
   tag applicable_partitions: ['aws', 'aws-us-gov']
   tag implementation_status: 'alternative'
+  tag attestation_category:  'policy'
   tag cis_rule_id:           'SV-0409r1_rule'
   tag cis_version:           '1.0.0'
   tag cis_level:             1
@@ -72,7 +73,21 @@ control 'C-4.9' do
     applicable
   end
 
-  describe 'CIS 4.9 — Make use of predefined roles' do
-      skip "Requires manual review and attestation provided for this control. Predefined-role usage (pg_monitor, pg_read_all_settings, pg_read_all_stats, etc.) is a consumer-policy decision documented in the role-design register. Operators attest from that register; the SQL surface (`SELECT * FROM pg_roles WHERE rolname LIKE 'pg\_%'`) lists what's available but doesn't tell us whether application roles SHOULD use them."
+  # Consumer-policy attestation (sparc-validate#154). document_attestation against
+  # the boundary's own policy/register doc; empty -> Skip.
+  uri = input('c_4_9_attestation_uri', value: '')
+  uri = attestation_uri(:boundary, 'C-4.9') if uri.to_s.empty?
+  max_age_days = input('attestation_max_age_days', value: 365)
+  if uri.to_s.empty?
+    describe 'CIS 4.9 — Make use of predefined roles' do
+      skip "Requires manual review and attestation provided for this control. Predefined-role usage (pg_monitor, pg_read_all_settings, pg_read_all_stats, etc.) is a consumer-policy decision documented in the role-design register. Operators attest from that register; the SQL surface (`SELECT * FROM pg_roles WHERE rolname LIKE 'pg\_%'`) lists what's available but doesn't tell us whether application roles SHOULD use them. [Lift: set boundary_docs_base / c_4_9_attestation_uri, or `saf attest apply`.]"
     end
+  else
+    doc = document_attestation(uri, max_age_days: max_age_days)
+    describe "CIS 4.9 — Make use of predefined roles (#{uri})" do
+      it('reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
+      it('exists') { expect(doc.exists?).to eq(true) }
+      it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+    end
+  end
 end
