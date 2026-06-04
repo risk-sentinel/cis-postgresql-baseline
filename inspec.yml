@@ -380,6 +380,37 @@ inputs:
     description: >-
       Staleness window (days) for the boundary policy attestations (8 alternative controls).
 
+  - name: cis_6_2_expected_params
+    type: hash
+    value: {}
+    description: >-
+      {param => expected_value} for the backend runtime-parameter category (CIS 6.2).
+      When non-empty, the control VERIFIES actual parameter-group values instead of attesting.
+  - name: cis_6_3_expected_params
+    type: hash
+    value: {}
+    description: >-
+      {param => expected_value} for the postmaster runtime-parameter category (CIS 6.3).
+      When non-empty, the control VERIFIES actual parameter-group values instead of attesting.
+  - name: cis_6_4_expected_params
+    type: hash
+    value: {}
+    description: >-
+      {param => expected_value} for the sighup runtime-parameter category (CIS 6.4).
+      When non-empty, the control VERIFIES actual parameter-group values instead of attesting.
+  - name: cis_6_5_expected_params
+    type: hash
+    value: {}
+    description: >-
+      {param => expected_value} for the superuser runtime-parameter category (CIS 6.5).
+      When non-empty, the control VERIFIES actual parameter-group values instead of attesting.
+  - name: cis_6_6_expected_params
+    type: hash
+    value: {}
+    description: >-
+      {param => expected_value} for the user runtime-parameter category (CIS 6.6).
+      When non-empty, the control VERIFIES actual parameter-group values instead of attesting.
+
 supports:
   - platform: aws
 

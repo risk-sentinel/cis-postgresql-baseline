@@ -129,21 +129,41 @@ control 'C-6.3' do
     applicable
   end
 
-  # Consumer-policy attestation (sparc-validate#154). document_attestation against
-  # the boundary's own policy/register doc; empty -> Skip.
-  uri = input('c_6_3_attestation_uri', value: '')
-  uri = attestation_uri(:boundary, 'C-6.3') if uri.to_s.empty?
-  max_age_days = input('attestation_max_age_days', value: 365)
-  if uri.to_s.empty?
-    describe 'CIS 6.3 — Postmaster runtime parameter category review' do
-      skip "Requires manual review and attestation provided for this control. CIS 6.3 covers the `postmaster` runtime-parameter category (parameters that require a server restart). Aurora consumers manage these via the cluster parameter group; the implementable subset is already covered by CIS 3.1 / 3.2 / 6.8-6.10 (which assert specific parameter values). 6.3 itself is a category-review attestation — operators confirm they've reviewed the postmaster category for their workload. [Lift: set boundary_docs_base / c_6_3_attestation_uri, or `saf attest apply`.]"
+  # VERIFY-don't-trust (sparc-validate Phase C): when the consumer declares the
+  # security-relevant runtime params for this category (#cis_6_3_expected_params = a
+  # {param => expected_value} hash), assert the ACTUAL parameter-group values
+  # rather than trusting an attestation. Undeclared -> attestation floor.
+  expected = input('cis_6_3_expected_params', value: {})
+  if expected.respond_to?(:empty?) && !expected.empty?
+    postgresql_parameter_groups.each do |target|
+      next if target[:pg_name].nil?
+      if target[:resource].respond_to?(:connection_error) && target[:resource].connection_error
+        describe "RDS DB Parameter Group: #{target[:pg_name]}" do
+          skip "pending-resource: parameter-group lookup failed for #{target[:id]} — #{target[:resource].connection_error}"
+        end
+        next
+      end
+      describe target[:resource] do
+        expected.each do |param, val|
+          its("parameter_value('#{param}')") { should cmp_pg_param(val.to_s) }
+        end
+      end
     end
   else
-    doc = document_attestation(uri, max_age_days: max_age_days)
-    describe "CIS 6.3 — Postmaster runtime parameter category review (#{uri})" do
-      it('reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
-      it('exists') { expect(doc.exists?).to eq(true) }
-      it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+    uri = input('c_6_3_attestation_uri', value: '')
+    uri = attestation_uri(:boundary, 'C-6.3') if uri.to_s.empty?
+    max_age_days = input('attestation_max_age_days', value: 365)
+    if uri.to_s.empty?
+      describe 'CIS 6.3 — Postmaster runtime parameter category review' do
+        skip "Requires manual review and attestation provided for this control. CIS 6.3 covers the `postmaster` runtime-parameter category (parameters that require a server restart). Aurora consumers manage these via the cluster parameter group; the implementable subset is already covered by CIS 3.1 / 3.2 / 6.8-6.10 (which assert specific parameter values). 6.3 itself is a category-review attestation — operators confirm they've reviewed the postmaster category for their workload. [Lift: set boundary_docs_base / c_6_3_attestation_uri, or `saf attest apply`.] Declare cis_6_3_expected_params to VERIFY actual param values instead of attesting. [Lift: set boundary_docs_base / c_6_3_attestation_uri, or `saf attest apply`.]"
+      end
+    else
+      doc = document_attestation(uri, max_age_days: max_age_days)
+      describe "CIS 6.3 — Postmaster runtime parameter category review (#{uri})" do
+        it('reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
+        it('exists') { expect(doc.exists?).to eq(true) }
+        it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+      end
     end
   end
 end

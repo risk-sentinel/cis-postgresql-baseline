@@ -201,21 +201,41 @@ control 'C-6.6' do
     applicable
   end
 
-  # Consumer-policy attestation (sparc-validate#154). document_attestation against
-  # the boundary's own policy/register doc; empty -> Skip.
-  uri = input('c_6_6_attestation_uri', value: '')
-  uri = attestation_uri(:boundary, 'C-6.6') if uri.to_s.empty?
-  max_age_days = input('attestation_max_age_days', value: 365)
-  if uri.to_s.empty?
-    describe 'CIS 6.6 — User runtime parameter category review' do
-      skip "Requires manual review and attestation provided for this control. CIS 6.6 covers the `user` runtime-parameter category (parameters any user can set per-session). The implementable bar — the application doesn't override security-relevant defaults via SET commands — is a consumer-policy attestation. [Lift: set boundary_docs_base / c_6_6_attestation_uri, or `saf attest apply`.]"
+  # VERIFY-don't-trust (sparc-validate Phase C): when the consumer declares the
+  # security-relevant runtime params for this category (#cis_6_6_expected_params = a
+  # {param => expected_value} hash), assert the ACTUAL parameter-group values
+  # rather than trusting an attestation. Undeclared -> attestation floor.
+  expected = input('cis_6_6_expected_params', value: {})
+  if expected.respond_to?(:empty?) && !expected.empty?
+    postgresql_parameter_groups.each do |target|
+      next if target[:pg_name].nil?
+      if target[:resource].respond_to?(:connection_error) && target[:resource].connection_error
+        describe "RDS DB Parameter Group: #{target[:pg_name]}" do
+          skip "pending-resource: parameter-group lookup failed for #{target[:id]} — #{target[:resource].connection_error}"
+        end
+        next
+      end
+      describe target[:resource] do
+        expected.each do |param, val|
+          its("parameter_value('#{param}')") { should cmp_pg_param(val.to_s) }
+        end
+      end
     end
   else
-    doc = document_attestation(uri, max_age_days: max_age_days)
-    describe "CIS 6.6 — User runtime parameter category review (#{uri})" do
-      it('reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
-      it('exists') { expect(doc.exists?).to eq(true) }
-      it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+    uri = input('c_6_6_attestation_uri', value: '')
+    uri = attestation_uri(:boundary, 'C-6.6') if uri.to_s.empty?
+    max_age_days = input('attestation_max_age_days', value: 365)
+    if uri.to_s.empty?
+      describe 'CIS 6.6 — User runtime parameter category review' do
+        skip "Requires manual review and attestation provided for this control. CIS 6.6 covers the `user` runtime-parameter category (parameters any user can set per-session). The implementable bar — the application doesn't override security-relevant defaults via SET commands — is a consumer-policy attestation. [Lift: set boundary_docs_base / c_6_6_attestation_uri, or `saf attest apply`.] Declare cis_6_6_expected_params to VERIFY actual param values instead of attesting. [Lift: set boundary_docs_base / c_6_6_attestation_uri, or `saf attest apply`.]"
+      end
+    else
+      doc = document_attestation(uri, max_age_days: max_age_days)
+      describe "CIS 6.6 — User runtime parameter category review (#{uri})" do
+        it('reachable') { expect(doc.connection_error).to be_nil, "attestation unreachable: #{doc.connection_error}" }
+        it('exists') { expect(doc.exists?).to eq(true) }
+        it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
+      end
     end
   end
 end
