@@ -83,10 +83,20 @@ control 'C-3.1.10' do
     applicable
   end
 
+  uri = input('inherited_evidence_uri', value: '')
+  uri = attestation_uri(:leveraged, 'aws-soc2-type2', ext: 'json') if uri.to_s.empty?
+  max_age_days = input('leveraged_evidence_max_age_days', value: 365)
   if %w[rds_instance aurora_cluster].include?(deployment)
-    describe 'AWS shared-responsibility inheritance (CIS 3.1.10 — ' + "Ensure the PostgreSQL 'pgaudit.log_directory' Configuration Setting Is Correct" + ')' do
-      it 'is satisfied by AWS-managed controls — ' + "AWS routes PostgreSQL logs to Amazon CloudWatch Logs via the published-log-types mechanism (postgresql.log / upgrade.log); the on-disk log_directory is internal to the AWS-managed host and not operator-tunable. Customer-facing controls live in the cluster parameter group (cis-postgresql §3.1.14–26 cover the log-content parameters that ARE operator-tunable)" + ' (evidence: AWS SOC 2 Type II, AWS FedRAMP Moderate, AWS FedRAMP High, AWS ISO 27001; AWS Artifact: https://console.aws.amazon.com/artifact/)' do
-        expect(true).to eq(true)
+    if uri.to_s.empty?
+      describe 'AWS shared-responsibility evidence (no leveraged source configured)' do
+        skip 'inherited-from-aws: set leveraged_evidence_base / inherited_evidence_uri to the pulled AWS evidence manifest (SOC 2 / FedRAMP / ISO), or `saf attest apply`.'
+      end
+    else
+      doc = document_attestation(uri, max_age_days: max_age_days)
+      describe "AWS shared-responsibility leveraged evidence (#{uri})" do
+        it('reachable') { expect(doc.connection_error).to be_nil, "evidence unreachable: #{doc.connection_error}" }
+        it('exists') { expect(doc.exists?).to eq(true) }
+        it("current within #{max_age_days}d") { expect(doc.current?).to eq(true) }
       end
     end
   else
@@ -95,4 +105,3 @@ control 'C-3.1.10' do
     end
   end
 end
-
