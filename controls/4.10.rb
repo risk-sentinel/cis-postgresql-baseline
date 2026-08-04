@@ -72,7 +72,7 @@ control 'C-4.10' do
   # only when a non-system login role lacks rds_iam membership AND
   # the consumer hasn't allowlisted it via `cis_4_10_password_role_allowlist`
   # (for roles that genuinely use stored passwords).
-  q = aws_rds_aurora_psql_query
+  q = postgresql_query
 
   describe 'CIS 4.10 — DB-connection precheck' do
     subject { q.connection_error }
