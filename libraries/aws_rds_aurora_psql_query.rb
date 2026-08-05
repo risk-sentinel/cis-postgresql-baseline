@@ -64,7 +64,14 @@ class AwsRdsAuroraPsqlQuery < AwsResourceBase
 
   def initialize(opts = {})
     super(opts)
-    validate_parameters
+    # AwsResourceBase#validate_parameters with no allow-list rejects every
+    # non-standard key with "Unexpected arguments found". The opts documented
+    # above were therefore never actually accepted — passing any of them raised
+    # at exec time, which is why callers fell back to the (broken) resource-scope
+    # input lookup. Declaring them makes the documented contract real. (#7)
+    validate_parameters(
+      allow: %i[cluster_endpoint endpoint database db_user port region]
+    )
 
     # Inputs are the canonical defaults; opts override.
     # Engine-agnostic input names take precedence; aurora_*-named inputs
@@ -105,7 +112,11 @@ class AwsRdsAuroraPsqlQuery < AwsResourceBase
   # instead of letting the control vacuous-PASS off empty query results).
   def connection_error
     unless exists?
-      return "no postgresql_endpoint / aurora_cluster_endpoint configured — set the input via the runner's CI secret or pass --input postgresql_endpoint=<host>"
+      return "no endpoint reached this resource. Either postgresql_endpoint / " \
+             "aurora_cluster_endpoint is genuinely unset, OR the caller built this " \
+             "resource without passing one — inputs are NOT readable from resource " \
+             "scope (#7). Controls should call `postgresql_query`, which resolves " \
+             "inputs at rule scope, rather than instantiating this resource directly."
     end
     _connect
     @resource_failure
@@ -142,13 +153,24 @@ class AwsRdsAuroraPsqlQuery < AwsResourceBase
 
   private
 
-  # InSpec's `input` is method-resolved at control scope, not at
-  # library scope; access via the runner if available, else fall back
-  # to ENV-based override or the default.
+  # LAST-RESORT fallback only. Inputs are not readable from resource scope --
+  # `input()` raises NoMethodError inside a resource class (#7) -- so callers
+  # must resolve inputs at RULE scope and pass them as opts. `postgresql_query`
+  # in _postgresql_scope_helpers.rb does exactly that and is the supported
+  # entry point.
+  #
+  # The previous `defined?(input)` guard was not sufficient: it resolves truthy,
+  # the call then raises, and the rescue path made a configured endpoint look
+  # unset. `respond_to?` is the honest test, so the ENV/default path is actually
+  # reached when inputs are unavailable.
   def _input_or_default(name, default)
-    if defined?(input)
-      val = input(name)
-      return val unless val.to_s.empty?
+    if respond_to?(:input)
+      begin
+        val = input(name)
+        return val unless val.to_s.empty?
+      rescue NoMethodError, NameError
+        # inputs genuinely unreachable from here -- fall through
+      end
     end
     ENV[name.upcase] || default
   end

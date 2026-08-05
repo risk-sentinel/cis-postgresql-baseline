@@ -60,7 +60,7 @@ control 'C-4.4' do
     applicable
   end
 
-  q = aws_rds_aurora_psql_query
+  q = postgresql_query
 
   # Connection-precheck — fails LOUDLY on no-endpoint-configured /
   # pg-missing / token-gen-failed / network-unreachable / auth-failed.
