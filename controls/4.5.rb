@@ -99,7 +99,7 @@ control 'C-4.5' do
   offenders = q.query(sql)
 
   describe 'Function EXECUTE privileges granted to PUBLIC outside system schemas (CIS 4.5)' do
-    subject { offenders.map { |r| "\#{r['routine_schema']}.\#{r['routine_name']}" } }
+    subject { offenders.map { |r| "#{r['routine_schema']}.#{r['routine_name']}" } }
     it { should be_empty }
   end
 end

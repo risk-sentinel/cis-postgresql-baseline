@@ -219,7 +219,7 @@ control 'C-4.6' do
   offenders = q.query(sql)
 
   describe 'DML (INSERT/UPDATE/DELETE/TRUNCATE) privileges granted to PUBLIC outside system schemas (CIS 4.6)' do
-    subject { offenders.map { |r| "\#{r['table_schema']}.\#{r['table_name']}:\#{r['privilege_type']}" } }
+    subject { offenders.map { |r| "#{r['table_schema']}.#{r['table_name']}:#{r['privilege_type']}" } }
     it { should be_empty }
   end
 end
