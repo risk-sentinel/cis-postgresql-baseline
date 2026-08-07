@@ -222,7 +222,7 @@ control 'C-4.7' do
 
   # Reportable list — auditors review against sensitive-data inventory.
   describe 'User tables without Row Level Security enabled (CIS 4.7 — review against sensitive-data inventory)' do
-    subject { candidates.map { |r| "\#{r['schema']}.\#{r['table_name']}" } }
+    subject { candidates.map { |r| "#{r['schema']}.#{r['table_name']}" } }
     # Soft assertion: the count is informational. A future input
     # (privacy_register) could narrow this.
     it { should be_a(Array) }
