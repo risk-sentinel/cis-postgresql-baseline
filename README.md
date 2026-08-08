@@ -246,3 +246,7 @@ The CIS PostgreSQL 18 XCCDF is the source-of-truth benchmark (v1.0.0 content is 
 All 72 controls have authored describe bodies. The Coverage Distribution table above reflects the as-shipped shape.
 
 Phase C (#29) is complete: 6 of the original 17 `pending-db-connection` controls flipped to `implemented` via the `aws_rds_aurora_psql_query` resource; the remaining 11 reclassified across `alternative` / `inherited` / `not-applicable`. The `planned` bucket is empty. The Phase-C controls degrade gracefully (skip with `pending-db-connection: aurora_cluster_endpoint not set`) when the consumer doesn't supply `aurora_cluster_endpoint`.
+
+---
+
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=risk-sentinel_cis-postgresql-v1.0.0)](https://sonarcloud.io/summary/new_code?id=risk-sentinel_cis-postgresql-v1.0.0)
