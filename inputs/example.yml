@@ -1,0 +1,95 @@
+# =============================================================================
+# cis-postgresql-baseline — reference inputs
+#
+#   cp inputs/example.yml inputs/mine.yml   # edit, then:
+#   cinc-auditor exec . -t aws:// --input-file inputs/mine.yml
+#
+# --input-file is NOT optional.
+#
+# READ THIS FIRST — this profile has two halves, and they need different things:
+#
+#   Configuration half   assessed through the RDS API. Works with AWS
+#                        credentials alone.
+#   In-database half     assessed by CONNECTING to the database and querying
+#                        pg_catalog. Needs an endpoint, a database name, a user,
+#                        and network reachability.
+#
+# With no endpoint configured the in-database controls go Not Applicable. They
+# do not fail, and the run still exits 0 — so a scan that never touched a
+# database looks very similar to one that did. Set postgresql_endpoint, or know
+# that you are only assessing the configuration half.
+# =============================================================================
+
+# ---- REQUIRED TO RUN --------------------------------------------------------
+
+aws_partition: aws
+
+# ---- THE IN-DATABASE HALF ---------------------------------------------------
+#
+# All four are needed together. Authentication is IAM, not a password: the
+# scanning identity needs rds-db:connect for the named user, and the endpoint
+# has to be reachable from wherever the profile runs — in practice, inside the
+# VPC. A scan from a laptop will not reach a private RDS endpoint.
+
+# Aurora cluster writer endpoint, if you run Aurora.
+aurora_cluster_endpoint: ''
+
+# Standalone RDS instance endpoint, if you run RDS PostgreSQL.
+postgresql_endpoint: ''
+
+# Database to connect to.
+postgresql_database_name: ''
+
+# Database user the scanner authenticates as, via IAM auth.
+postgresql_scanner_dbuser: ''
+
+# ---- SCOPING ----------------------------------------------------------------
+
+# Cluster / instance identifiers to assess.
+# EMPTY = whatever is discovered in the account.
+postgresql_cluster_identifiers: []
+postgresql_instance_identifiers: []
+
+# Engines to force in or out of scope, overriding discovery.
+excluded_engines: []
+forced_engines: []
+
+# ---- IN-DATABASE ALLOW-LISTS ------------------------------------------------
+#
+# Roles exempt from specific checks. Each entry is a documented exception, and
+# an empty list means no exceptions rather than no checking.
+
+cis_4_4_inactive_role_allowlist: []
+cis_4_10_password_role_allowlist: []
+cis_4_3_admin_role_allowlist: []
+postgresql_admin_role_allowlist: []
+cis_5_5_connection_limit_allowlist: []
+
+# ---- EXPECTED PARAMETER SETS ------------------------------------------------
+#
+# The CIS §6 controls compare live postgres settings against what you declare
+# here. EMPTY = the control has no expectation to compare against and skips.
+# These encode YOUR parameter policy; there is no universal correct answer,
+# which is why they ship empty rather than guessed.
+#
+#   cis_6_2_expected_params:
+#     log_destination: stderr
+#     logging_collector: 'on'
+cis_6_2_expected_params: {}
+cis_6_3_expected_params: {}
+cis_6_4_expected_params: {}
+cis_6_5_expected_params: {}
+cis_6_6_expected_params: {}
+
+# ---- LOGGING + ATTESTATION --------------------------------------------------
+
+logging_requirements: {}
+logging_attestation_reference: ''
+
+# Evidence-class bases. The inherited-from-AWS controls are the largest single
+# group in this profile — with these empty, 34 controls skip asking for the
+# leveraged authorization evidence rather than passing.
+leveraged_evidence_base: ''
+policy_provider_base: ''
+boundary_docs_base: ''
+inherited_evidence_uri: ''
