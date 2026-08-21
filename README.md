@@ -1,6 +1,6 @@
 # cis-postgresql-baseline
 
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=risk-sentinel_cis-postgresql-v1.0.0)](https://sonarcloud.io/summary/new_code?id=risk-sentinel_cis-postgresql-v1.0.0)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=risk-sentinel_cis-postgresql-baseline)](https://sonarcloud.io/summary/new_code?id=risk-sentinel_cis-postgresql-baseline)
 
 InSpec / CINC Auditor profile validating **PostgreSQL on AWS** (RDS and Aurora)
 against the **CIS PostgreSQL Benchmark v1.0.0** — 72 controls across engine
