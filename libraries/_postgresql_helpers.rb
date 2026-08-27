@@ -87,7 +87,7 @@ end
 # cinc-auditor 7.x evaluates this file inside an anonymous-class scope
 # (Inspec::ProfileContext#load_with_context uses instance_eval). Bare
 # `Inspec::Rule` constant lookup is rooted at that anonymous class —
-# fails with NameError, which is what surfaced in PR #86's first CI run.
+# fails with NameError, which is what surfaced on the first CI run.
 # `if defined?(Inspec::Rule)` avoids the NameError but makes the include
 # a silent no-op when the constant isn't visible — methods then never
 # attach to Inspec::Rule and controls fail with "undefined local variable
