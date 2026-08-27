@@ -5,10 +5,9 @@
 #
 # Verbatim copy of the AWS Foundations / AWS Database bootstrap
 # files — InSpec evaluates libraries/ per profile, so each profile that
-# ships local resources needs its own. See #24 for the full gotcha
-# context (InSpec's instance_eval load path means __dir__ /
-# require_relative can't locate the vendor tree; Dir.pwd-anchored globs
-# are required).
+# ships local resources needs its own. InSpec's instance_eval load path
+# means __dir__ and require_relative cannot locate the vendor tree, so
+# Dir.pwd-anchored globs are required.
 #
 # The leading underscore in the filename sorts this file first in
 # InSpec's alphabetical library-load order, so sibling files can

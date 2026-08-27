@@ -64,7 +64,7 @@ control 'C-4.10' do
   # stored password. We can observe `rds_iam` membership via the
   # public pg_auth_members / pg_roles views; we cannot read
   # `pg_authid.rolpassword` (scanner role has no grant — password
-  # hashes are off-limits per the #184 discussion).
+  # hashes are off-limits to the scanner).
   #
   # Implication of the unobservable rolpassword: a role that's NOT
   # rds_iam member may still have a valid stored password. So the
