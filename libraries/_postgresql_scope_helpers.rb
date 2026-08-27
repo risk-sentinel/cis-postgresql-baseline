@@ -58,7 +58,7 @@ module PostgresqlScopeHelpers
   # Build the DB-connection resource with its settings resolved HERE, at
   # rule scope, and passed in as params.
   #
-  # `input()` raises NoMethodError inside a resource class (#7) — verified on
+  # `input()` raises NoMethodError inside a resource class — verified on
   # cinc-auditor 7.0.107: a helper mixed into ::Inspec::Rule reads an input
   # fine, the identical call inside `Inspec.resource(1)` raises. The resource's
   # own `_input_or_default` fallback therefore never sees a value and reports a

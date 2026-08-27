@@ -68,7 +68,7 @@ class AwsRdsAuroraPsqlQuery < AwsResourceBase
     # non-standard key with "Unexpected arguments found". The opts documented
     # above were therefore never actually accepted — passing any of them raised
     # at exec time, which is why callers fell back to the (broken) resource-scope
-    # input lookup. Declaring them makes the documented contract real. (#7)
+    # input lookup. Declaring them makes the documented contract real.
     validate_parameters(
       allow: %i[cluster_endpoint endpoint database db_user port region]
     )
@@ -154,7 +154,7 @@ class AwsRdsAuroraPsqlQuery < AwsResourceBase
   private
 
   # LAST-RESORT fallback only. Inputs are not readable from resource scope --
-  # `input()` raises NoMethodError inside a resource class (#7) -- so callers
+  # `input()` raises NoMethodError inside a resource class -- so callers
   # must resolve inputs at RULE scope and pass them as opts. `postgresql_query`
   # in _postgresql_scope_helpers.rb does exactly that and is the supported
   # entry point.
