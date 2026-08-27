@@ -64,7 +64,7 @@ module PostgresqlScopeHelpers
   # own `_input_or_default` fallback therefore never sees a value and reports a
   # correctly-configured endpoint as missing, which is indistinguishable from
   # it being unset. That cost real debugging time downstream
-  # (sparc-validate#286, #292) before the two contexts were compared directly.
+  # before the two contexts were compared directly.
   #
   # Resolving here also guarantees the connection uses the SAME endpoint the
   # scope check used. Previously `postgresql_in_scope?` (rule scope, worked)

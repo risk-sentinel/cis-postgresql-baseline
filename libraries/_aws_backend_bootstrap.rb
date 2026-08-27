@@ -3,7 +3,7 @@
 # file is parsed. Without this, `cinc-auditor exec` fails at library-load
 # time with `cannot load such file -- aws_backend (LoadError)`.
 #
-# Verbatim copy of sparc-aws-foundations / sparc-aws-database bootstrap
+# Verbatim copy of the AWS Foundations / AWS Database bootstrap
 # files — InSpec evaluates libraries/ per profile, so each profile that
 # ships local resources needs its own. See #24 for the full gotcha
 # context (InSpec's instance_eval load path means __dir__ /

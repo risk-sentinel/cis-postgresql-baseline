@@ -342,7 +342,7 @@ inputs:
         structured assertions beyond presence (e.g., {"5.7":
         {"threshold": 3}}).
 
-  # ---- document_attestation evidence-class bases (sparc-validate#154) ----
+  # ---- document_attestation evidence-class bases ----
   - name: leveraged_evidence_base
     type: string
     value: ''

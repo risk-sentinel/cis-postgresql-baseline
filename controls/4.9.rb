@@ -73,7 +73,7 @@ control 'C-4.9' do
     applicable
   end
 
-  # Consumer-policy attestation (sparc-validate#154). document_attestation against
+  # Consumer-policy attestation. document_attestation against
   # the boundary's own policy/register doc; empty -> Skip.
   uri = input('c_4_9_attestation_uri', value: '')
   uri = attestation_uri(:boundary, 'C-4.9') if uri.to_s.empty?

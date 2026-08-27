@@ -1,6 +1,6 @@
 # cis-postgresql — verification coverage matrix
 
-Phase C (sparc-validate verification-rigor sweep). Principle: **verify the
+Verification-rigor sweep. Principle: **verify the
 technical state wherever the platform can answer it; never accept a human
 attestation as proof of a checkable fact.** Attestation is the last resort —
 reserved for facts the platform genuinely cannot expose — and even then carries

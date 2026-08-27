@@ -119,7 +119,7 @@ control 'C-6.5' do
     applicable
   end
 
-  # VERIFY-don't-trust (sparc-validate Phase C): when the consumer declares the
+  # VERIFY-don't-trust: when the consumer declares the
   # security-relevant runtime params for this category (#cis_6_5_expected_params = a
   # {param => expected_value} hash), assert the ACTUAL parameter-group values
   # rather than trusting an attestation. Undeclared -> attestation floor.
