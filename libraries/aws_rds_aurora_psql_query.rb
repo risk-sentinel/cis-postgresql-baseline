@@ -1,14 +1,14 @@
 # Custom InSpec resource — psql connection to Aurora-PostgreSQL via
 # IAM DB auth, used by the §4 / §5 / §6 / §8.3 controls that need to
-# query pg_catalog / information_schema. Phase C of #29.
+# query pg_catalog / information_schema.
 #
 # Connection prerequisites (provisioned by the consumer's infra-bootstrap pipeline):
 #   - IAM role `${prefix}-db-scanner` with rds-db:connect action against
 #     `dbuser/inspec_scanner`. OIDC-trusted to the calling repository,
 #     i.e. `repo:<your-org>/<caller-repo>`.
 #   - DB user `inspec_scanner` with `rds_iam` role + read-only grants
-#     on pg_catalog + information_schema. No grants on pg_authid (per
-#     the #184 discussion — password hashes off-limits).
+#     on pg_catalog + information_schema. No grants on pg_authid: it
+#     holds password hashes, which no control needs to read.
 #   - Network path from the runner to the cluster reader endpoint.
 #     Today via the on-demand VPC self-hosted runner shipped in
 #     the consumer's infra-bootstrap pipeline; consumers without a private cluster can use a
