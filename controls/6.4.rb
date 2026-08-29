@@ -137,6 +137,7 @@ control 'C-6.4' do
     Restore all values in the PostgreSQL configuration files and invoke the server to reload the configuration files.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 a']
   tag cci:                   ['CCI-000363']
   tag cis_number:            '6.4'

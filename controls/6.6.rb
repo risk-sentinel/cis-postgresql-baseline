@@ -176,6 +176,7 @@ control 'C-6.6' do
     In the matter of a user session, the login sessions must be validated that it is not executing undesired parameter changes. In the matter of attributes that have been changed in entities, they must be manually reverted to their default value(s).
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 a']
   tag cci:                   ['CCI-000363']
   tag cis_number:            '6.6'

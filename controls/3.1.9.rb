@@ -35,6 +35,7 @@ control 'C-3.1.9' do
     ```
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-2 (2)', 'AU-4']
   tag cci:                   ['CCI-001682', 'CCI-001848']
   tag cis_number:            '3.1.9'

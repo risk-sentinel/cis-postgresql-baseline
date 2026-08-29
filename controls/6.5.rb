@@ -94,6 +94,7 @@ control 'C-6.5' do
     4. Examine the contents of `$PGDATA/postmaster.opts`
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 a']
   tag cci:                   ['CCI-000363']
   tag cis_number:            '6.5'

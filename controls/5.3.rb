@@ -91,6 +91,7 @@ control 'C-5.3' do
     ```
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['SC-7 a', 'IA-2 (2)']
   tag cci:                   ['CCI-001097', 'CCI-000766']
   tag cis_number:            '5.3'

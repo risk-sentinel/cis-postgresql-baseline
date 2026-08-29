@@ -29,6 +29,7 @@ control 'C-6.1' do
     In the case of a changed parameter, the value is returned back to its default value. In the case of a successful exploit of an already set runtime parameter then an analysis must be carried out to determine the best approach in mitigating the risk to prevent future exploitation.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 a']
   tag cci:                   ['CCI-000363']
   tag cis_number:            '6.1'

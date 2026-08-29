@@ -40,6 +40,7 @@ control 'C-8.3' do
     * Lastly, change the settings accordingly in the `postgresql.conf` configuration file and restart the database cluster for changes to take effect.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 a']
   tag cci:                   ['CCI-000363']
   tag cis_number:            '8.3'

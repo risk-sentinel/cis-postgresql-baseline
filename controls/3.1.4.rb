@@ -42,6 +42,7 @@ control 'C-3.1.4' do
     Note: The use of `/var/log/postgres`, above, is an example. This should be set to an appropriate path as defined by your organization's logging requirements. Having said that, it is a good idea to have the logs outside of your `PGDATA` directory so that they are not included by things like `pg_basebackup` or `pgBackRest`.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-2 f', 'IA-2 (2)', 'AU-2 a', 'AU-3 a']
   tag cci:                   ['CCI-000011', 'CCI-000766', 'CCI-000123', 'CCI-000130']
   tag cis_number:            '3.1.4'

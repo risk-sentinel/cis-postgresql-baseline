@@ -43,6 +43,7 @@ control 'C-5.2' do
     In this case, clients can connect to the server using `--host=`_` `_, while connections on other server host addresses are not possible.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['SA-8']
   tag cci:                   ['CCI-000664']
   tag cis_number:            '5.2'
