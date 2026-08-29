@@ -52,7 +52,10 @@ control 'C-4.5' do
     Based on the output above, `appreader=X/postgres` no longer exists in the `proacl` column results returned from the query and confirms `appreader` is no longer granted execute privilege on the function.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['CM-6 a', 'AC-2 a']
+  tag ksi:                   ['KSI-CMT-LMC', 'KSI-CMT-RMV', 'KSI-IAM-APM', 'KSI-IAM-JIT', 'KSI-IAM-SNU', 'KSI-IAM-SUS', 'KSI-MLA-EVC', 'KSI-SVC-ACM']
+  tag nist_r4:               ['AC-2 a', 'CM-6 a']
   tag cci:                   ['CCI-000364', 'CCI-002110']
   tag cis_number:            '4.5'
   tag cis_rid:               '4.5'

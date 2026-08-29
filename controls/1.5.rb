@@ -39,7 +39,9 @@ control 'C-1.5' do
     ```
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['MA-3 a']
+  tag nist_r4:               ['MA-3']
   tag cci:                   ['CCI-000865']
   tag cis_number:            '1.5'
   tag cis_rid:               '1.5'

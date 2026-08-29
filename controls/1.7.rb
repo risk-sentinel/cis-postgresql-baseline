@@ -30,7 +30,10 @@ control 'C-1.7' do
     to use a more secure method.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['SC-28']
+  tag ksi:                   ['KSI-SVC-SIN']
+  tag nist_r4:               ['SC-28']
   tag cci:                   ['CCI-001199']
   tag cis_number:            '1.7'
   tag cis_rid:               '1.7'

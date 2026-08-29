@@ -40,7 +40,10 @@ control 'C-6.9' do
     ```
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['SC-8']
+  tag ksi:                   ['KSI-CNA-MAT', 'KSI-CNA-ULN', 'KSI-SVC-SIN']
+  tag nist_r4:               ['SC-8']
   tag cci:                   ['CCI-002418']
   tag cis_number:            '6.9'
   tag cis_rid:               '6.9'

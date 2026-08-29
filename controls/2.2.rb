@@ -42,7 +42,10 @@ control 'C-2.2' do
     If the permissions needed correct, it is *imperative* that all extensions found in `$ext_dir` are evaluated to ensure they have not been modified!
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['AC-3']
+  tag ksi:                   ['KSI-IAM-APM', 'KSI-IAM-ELP', 'KSI-IAM-JIT']
+  tag nist_r4:               ['AC-3']
   tag cci:                   ['CCI-000213']
   tag cis_number:            '2.2'
   tag cis_rid:               '2.2'

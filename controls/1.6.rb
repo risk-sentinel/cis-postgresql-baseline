@@ -27,7 +27,10 @@ control 'C-1.6' do
     Check which users and/or scripts are setting `PGPASSWORD` and change them to use a more secure method.
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['SC-28']
+  tag ksi:                   ['KSI-SVC-SIN']
+  tag nist_r4:               ['SC-28']
   tag cci:                   ['CCI-001199']
   tag cis_number:            '1.6'
   tag cis_rid:               '1.6'

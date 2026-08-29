@@ -36,7 +36,10 @@ control 'C-3.1.19' do
     ```
   "
   tag severity:              'medium'
+  tag severity_source:       'unassessed'
   tag nist:                  ['IA-2 (2)', 'AU-3 a']
+  tag ksi:                   ['KSI-IAM-APM', 'KSI-MLA-OSM']
+  tag nist_r4:               ['AU-3', 'IA-2 (2)']
   tag cci:                   ['CCI-000766', 'CCI-000130']
   tag cis_number:            '3.1.19'
   tag cis_rid:               '3.1.19'
