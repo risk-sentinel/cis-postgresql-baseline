@@ -30,6 +30,7 @@ control 'C-2.4' do
   tag severity:              'medium'
   tag severity_source:       'unassessed'
   tag nist:                  ['SC-28']
+  tag ksi:                   ['KSI-SVC-SIN']
   tag nist_r4:               ['SC-28']
   tag cci:                   ['CCI-001199']
   tag cis_number:            '2.4'
