@@ -36,6 +36,18 @@ version: 0.1.0
 inspec_version: '>= 5.0'
 
 inputs:
+  - name: scan_regions
+    type: array
+    value: []                  # REQUIRED. RDS is regional: a Postgres instance or
+                               # Aurora cluster in another region is never
+                               # enumerated, and the parameter-group controls then
+                               # assess nothing while passing. Empty is an ERROR.
+                               # Use ["*"] to sweep every enabled region.
+                               #
+                               # The consuming overlay already set this; until now
+                               # the profile declared no such input, so that value
+                               # was inert — a consumer believed they had set the
+                               # scan scope and nothing read it.
   - name: aws_partition
     type: string
     value: aws
