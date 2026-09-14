@@ -100,10 +100,18 @@ class AwsRdsAuroraPsqlQuery < AwsResourceBase
     # token is SIGNED for a region, so a wrong guess fails the connection rather
     # than passing, but it fails citing credentials instead of the real cause: we
     # assumed a region nobody chose. Guessing is now refused instead.
+    #
+    # ENV.fetch with an explicit nil default, not ENV[...]: the fetch form states
+    # that an absent variable is expected rather than a mistake. The empty-string
+    # filter is still required either way -- an exported-but-blank variable reads
+    # as "" and would otherwise win the `||` chain against a real region.
+    env_region = [
+      ENV.fetch('AWS_REGION', nil),
+      ENV.fetch('AWS_DEFAULT_REGION', nil),
+    ].find { |candidate| !candidate.to_s.empty? }
     @region = (opts[:region].to_s.empty? ? nil : opts[:region].to_s) ||
               _region_from_endpoint(@cluster_endpoint) ||
-              (ENV['AWS_REGION'].to_s.empty? ? nil : ENV['AWS_REGION']) ||
-              (ENV['AWS_DEFAULT_REGION'].to_s.empty? ? nil : ENV['AWS_DEFAULT_REGION'])
+              env_region
     @region = @region.to_s
     @connection       = nil
   end
@@ -201,7 +209,7 @@ class AwsRdsAuroraPsqlQuery < AwsResourceBase
         # inputs genuinely unreachable from here -- fall through
       end
     end
-    ENV[name.upcase] || default
+    ENV.fetch(name.upcase, nil) || default
   end
 
   # Try a chain of input names, returning the first non-empty value.
