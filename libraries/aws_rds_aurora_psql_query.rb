@@ -92,8 +92,37 @@ class AwsRdsAuroraPsqlQuery < AwsResourceBase
                          _input_or_default_chained(['postgresql_scanner_dbuser', 'aurora_scanner_dbuser'], 'inspec_scanner')).to_s
     @port             = Integer(opts[:port]      ||
                                 _input_or_default_chained(['postgresql_port', 'aurora_port'], 5432))
-    @region           = (opts[:region]           || ENV['AWS_REGION'] || ENV['AWS_DEFAULT_REGION'] || 'us-east-1').to_s
+    # Region resolution, most authoritative first. An Aurora endpoint carries its
+    # own region in the hostname -- cluster-x.cluster-abc.us-west-2.rds.amazonaws.com
+    # -- so the endpoint answers the question better than any default can.
+    #
+    # The previous fallback ended in a literal 'us-east-1'. For IAM DB auth the
+    # token is SIGNED for a region, so a wrong guess fails the connection rather
+    # than passing, but it fails citing credentials instead of the real cause: we
+    # assumed a region nobody chose. Guessing is now refused instead.
+    @region = (opts[:region].to_s.empty? ? nil : opts[:region].to_s) ||
+              _region_from_endpoint(@cluster_endpoint) ||
+              (ENV['AWS_REGION'].to_s.empty? ? nil : ENV['AWS_REGION']) ||
+              (ENV['AWS_DEFAULT_REGION'].to_s.empty? ? nil : ENV['AWS_DEFAULT_REGION'])
+    @region = @region.to_s
     @connection       = nil
+  end
+
+  # amazonaws.com endpoints embed the region between the identifier and the
+  # service label. Returns nil rather than a guess when the shape is unfamiliar.
+  def _region_from_endpoint(endpoint)
+    parts = endpoint.to_s.split('.')
+    idx = parts.index('rds')
+    return nil if idx.nil? || idx.zero?
+    candidate = parts[idx - 1].to_s
+    candidate =~ /\A[a-z]{2}(-gov)?-[a-z]+-\d\z/ ? candidate : nil
+  end
+
+  # True when we never established a region. A control should assert this before
+  # asserting on query results, so "we could not work out where to connect" is
+  # not reported as a database finding.
+  def region_unresolved?
+    @region.to_s.empty?
   end
 
   def exists?

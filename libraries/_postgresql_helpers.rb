@@ -51,9 +51,28 @@ module PostgresqlHelpers
 
   private
 
+  # Regions to enumerate RDS in. Control scope, so input() is readable here --
+  # unlike resource scope, where it raises.
+  #
+  # Empty is an ERROR rather than a fallback: enumerating one region and passing
+  # is indistinguishable in the evidence from finding nothing, which is the
+  # defect this profile is being corrected for.
+  def postgresql_scan_regions
+    regions = Array(input('scan_regions')).map(&:to_s).map(&:strip).reject(&:empty?)
+    if regions.empty?
+      raise Inspec::Exceptions::ResourceFailed,
+            'no scan_regions supplied -- refusing to enumerate a single region ' \
+            'silently. Set scan_regions to the regions in scope, or to ["*"] to ' \
+            'sweep every enabled region in the partition.'
+    end
+    return regions unless regions.include?('*')
+    inspec.backend.compute_client.describe_regions.regions.map(&:region_name)
+  end
+
   def _postgresql_aurora_targets
     allowed = Array(input('postgresql_cluster_identifiers'))
-    aws_rds_clusters.entries.select { |c| c[:engine] == 'aurora-postgresql' }.select do |c|
+    postgresql_scan_regions.flat_map { |r| aws_rds_clusters(aws_region: r).entries }
+      .select { |c| c[:engine] == 'aurora-postgresql' }.select do |c|
       allowed.empty? || allowed.include?(c[:db_cluster_identifier])
     end.map do |c|
       pg_name = c[:db_cluster_parameter_group]
@@ -69,7 +88,8 @@ module PostgresqlHelpers
 
   def _postgresql_rds_instance_targets
     allowed = Array(input('postgresql_instance_identifiers'))
-    aws_rds_instances.entries.select { |i| i[:engine].to_s.start_with?('postgres') }.select do |i|
+    postgresql_scan_regions.flat_map { |r| aws_rds_instances(aws_region: r).entries }
+      .select { |i| i[:engine].to_s.start_with?('postgres') }.select do |i|
       allowed.empty? || allowed.include?(i[:db_instance_identifier])
     end.map do |i|
       pg_name = Array(i[:db_parameter_groups]).first&.dig(:db_parameter_group_name)
