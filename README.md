@@ -136,7 +136,7 @@ jobs:
 include:
   - project: risk-sentinel/cis-postgresql-baseline
     ref: v0.1.8
-    file: /ci/gitlab/exec-evidence.yml
+    file: /ci/jobs/exec-evidence.yml
     inputs:
       target: my-database
       boundary: my-boundary
