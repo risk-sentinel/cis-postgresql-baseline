@@ -58,9 +58,9 @@ control 'C-2.3' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['MP-6 a']
-  tag nist_r4:               ['MP-6 a']
-  tag cci:                   ['CCI-001028']
+  tag nist:                  ['SR-12', 'MP-6 b', 'MP-6 a']
+  tag nist_r4:               ['MP-6 a', 'MP-6 b']
+  tag cci:                   ['CCI-005144', 'CCI-002580', 'CCI-001028']
   tag cis_number:            '2.3'
   tag cis_rid:               '2.3'
   tag cis_benchmark:         'CIS PostgreSQL Benchmark (v14–v18)'

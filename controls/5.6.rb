@@ -52,10 +52,10 @@ control 'C-5.6' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['IA-5 (1) (e)']
+  tag nist:                  ['IA-5 (1) (h)', 'IA-5 (1) (b)']
   tag ksi:                   ['KSI-IAM-APM']
-  tag nist_r4:               ['IA-5 (1) (e)']
-  tag cci:                   ['CCI-000200']
+  tag nist_r4:               ['IA-5 (1)']
+  tag cci:                   ['CCI-004066', 'CCI-004061']
   tag cis_number:            '5.6'
   tag cis_rid:               '5.6'
   tag cis_benchmark:         'CIS PostgreSQL Benchmark (v14–v18)'
