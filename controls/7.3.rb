@@ -25,10 +25,10 @@ control 'C-7.3' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['MP-7 (a)', 'CP-4 a']
+  tag nist:                  ['CP-9 (2)', 'CP-9 (1)', 'CP-4 (4)']
   tag ksi:                   ['KSI-RPL-TRC']
-  tag nist_r4:               ['CP-4 a', 'MP-7']
-  tag cci:                   ['CCI-002581', 'CCI-000490']
+  tag nist_r4:               ['CP-4 (4)4', 'CP-9 (1)', 'CP-9 (2)']
+  tag cci:                   ['CCI-000543', 'CCI-000542', 'CCI-000504']
   tag cis_number:            '7.3'
   tag cis_rid:               '7.3'
   tag cis_benchmark:         'CIS PostgreSQL Benchmark (v14–v18)'
