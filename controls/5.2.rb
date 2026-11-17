@@ -44,10 +44,10 @@ control 'C-5.2' do
   "
   tag severity:              'medium'
   tag severity_source:       'unassessed'
-  tag nist:                  ['SA-8']
-  tag ksi:                   ['KSI-PIY-RSD']
-  tag nist_r4:               ['SA-8']
-  tag cci:                   ['CCI-000664']
+  tag nist:                  ['PL-8 a 1', 'PL-8 (1) (a)', 'PL-8 a']
+  tag ksi:                   ['KSI-PIY-RSD', 'KSI-SVC-EIS']
+  tag nist_r4:               ['PL-8 (1) (a)', 'PL-8 a', 'PL-8 a 1']
+  tag cci:                   ['CCI-003073', 'CCI-003081', 'CCI-003072']
   tag cis_number:            '5.2'
   tag cis_rid:               '5.2'
   tag cis_benchmark:         'CIS PostgreSQL Benchmark (v14–v18)'
